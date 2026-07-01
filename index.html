@@ -152,6 +152,12 @@
     .meaning-card h4{color:var(--dark-brown);font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
     .meaning-card p{color:#333;line-height:1.9;font-size:.95rem;white-space:pre-wrap}
     .meaning-card .empty-note{color:#aa8;font-style:italic}
+    .meaning-card.purple{border-left-color:var(--purple-accent)}
+    .qa-list{display:flex;flex-direction:column;gap:16px}
+    .qa-item{border-bottom:1px dashed var(--border-light);padding-bottom:14px}
+    .qa-item:last-child{border-bottom:none;padding-bottom:0}
+    .qa-item .qa-q{color:var(--purple-accent);font-weight:700;margin-bottom:6px;display:flex;gap:8px}
+    .qa-item .qa-a{color:#333;line-height:1.9;font-size:.95rem;white-space:pre-wrap}
 
     /* FORM / EDITOR */
     .add-form-container{background:#fff;border-radius:20px;padding:30px;box-shadow:0 4px 20px var(--shadow);max-width:900px}
@@ -779,6 +785,7 @@ function renderAnalysis(g, v){
     // meanings
     const hindi = ov.hindi || v.hs || '';
     const anv   = v.anv || '';
+    const qa    = v.qa || [];
 
     const html = `
         <div class="shlok-header-card animate-in">
@@ -793,6 +800,18 @@ function renderAnalysis(g, v){
             <h4>💡 हिन्दी अर्थ ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
             <p>${hindi || '<span class="empty-note">हिन्दी अर्थ अभी उपलब्ध नहीं — "विश्लेषण जोड़ें" से भरें।</span>'}</p>
         </div>
+
+        ${qa.length ? `
+        <div class="meaning-card purple animate-in">
+            <h4>❓ प्रश्नोत्तर</h4>
+            <div class="qa-list">
+                ${qa.map(item=>`
+                <div class="qa-item">
+                    <div class="qa-q">प्रश्न: <span>${item.q}</span></div>
+                    <div class="qa-a">${item.a}</div>
+                </div>`).join('')}
+            </div>
+        </div>` : ''}
 
         <div class="verse-nav">
             <button ${nb.prev?'':'disabled'} onclick="${nb.prev?`openVerse('${nb.prev}')`:''}">← पिछला श्लोक</button>
