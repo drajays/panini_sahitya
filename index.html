@@ -108,6 +108,20 @@
     .verse-nav button:hover:not(:disabled){background:var(--light-gold);border-color:var(--gold)}
     .verse-nav button:disabled{opacity:.35;cursor:default}
 
+    /* FOCUS / FULLSCREEN MODE */
+    body.focus-mode header,body.focus-mode .sidebar{display:none}
+    body.focus-mode .main-container{grid-template-columns:1fr;min-height:100vh}
+    body.focus-mode .content-area{height:100vh;padding:26px clamp(16px,6vw,60px) 90px}
+    body.focus-mode .analysis-container{max-width:900px;margin:0 auto}
+    .focus-navbar{display:none;position:fixed;top:16px;right:16px;z-index:2000;align-items:center;gap:8px;background:rgba(61,28,2,.92);border:1px solid rgba(255,215,0,.35);border-radius:30px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    body.focus-mode .focus-navbar{display:flex}
+    .focus-navbar .focus-ref{color:#FFD700;font-size:.75rem;padding:0 8px;white-space:nowrap}
+    .focus-navbar button{border:none;background:rgba(255,215,0,.12);color:#FFD700;padding:7px 14px;border-radius:20px;font-size:.78rem;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s}
+    .focus-navbar button:hover:not(:disabled){background:rgba(255,215,0,.28)}
+    .focus-navbar button:disabled{opacity:.3;cursor:default}
+    .focus-navbar button.exit{background:var(--deep-saffron);color:#fff}
+    .focus-navbar button.exit:hover{background:var(--saffron)}
+
     .tabs{display:flex;gap:4px;background:rgba(61,28,2,.08);padding:4px;border-radius:14px;margin-bottom:24px;flex-wrap:wrap}
     .tab{flex:1;min-width:110px;padding:10px 16px;border:none;background:transparent;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.85rem;color:var(--text-medium);transition:all .3s;white-space:nowrap;text-align:center}
     .tab.active{background:#fff;color:var(--saffron);font-weight:bold;box-shadow:0 2px 8px var(--shadow)}
@@ -236,6 +250,13 @@
         <div class="nav-item" data-nav="about" onclick="go('about')">ℹ️ परिचय</div>
     </nav>
 </header>
+
+<div class="focus-navbar" id="focusNavbar">
+    <span class="focus-ref" id="focusRef"></span>
+    <button id="focusPrevBtn" onclick="focusNavTo('prev')">← पिछला</button>
+    <button class="exit" onclick="toggleFocusMode()">✕ बाहर (Esc)</button>
+    <button id="focusNextBtn" onclick="focusNavTo('next')">अगला →</button>
+</div>
 
 <div class="main-container">
     <aside class="sidebar" id="sidebar">
@@ -649,16 +670,68 @@ function neighbourIds(g, v){
     return { prev: idx>0?list[idx-1]._id:null, next: idx>=0&&idx<list.length-1?list[idx+1]._id:null };
 }
 
-/* keyboard navigation: ←/→ move between shlokas while viewing analysis */
+/* ---- focus / fullscreen reading mode ---- */
+let focusMode = false;
+
+function toggleFocusMode(){
+    focusMode = !focusMode;
+    document.body.classList.toggle('focus-mode', focusMode);
+    if(focusMode){
+        const el = document.documentElement;
+        if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    } else if(document.fullscreenElement){
+        document.exitFullscreen().catch(()=>{});
+    }
+    // re-render current verse so the verse-nav button label reflects the new state
+    if(cur.grantha && cur.verseId && cache[cur.grantha]){
+        const g = cache[cur.grantha], v = g.versesById[cur.verseId];
+        if(v) renderAnalysis(g, v);
+    }
+    updateFocusNavbar();
+}
+
+function focusNavTo(dir){
+    if(!cur.nb) return;
+    const id = dir==='prev' ? cur.nb.prev : cur.nb.next;
+    if(id) openVerse(id);
+}
+
+function updateFocusNavbar(){
+    const prevBtn = document.getElementById('focusPrevBtn');
+    const nextBtn = document.getElementById('focusNextBtn');
+    const refEl = document.getElementById('focusRef');
+    if(prevBtn) prevBtn.disabled = !(cur.nb && cur.nb.prev);
+    if(nextBtn) nextBtn.disabled = !(cur.nb && cur.nb.next);
+    if(refEl && cur.grantha && cache[cur.grantha]){
+        const g = cache[cur.grantha], v = g.versesById[cur.verseId];
+        if(v) refEl.textContent = verseRef(g, v).ref;
+    }
+}
+
+// keep our state in sync if the user exits native fullscreen via the browser's own Esc/UI
+document.addEventListener('fullscreenchange', ()=>{
+    if(!document.fullscreenElement && focusMode){
+        focusMode = false;
+        document.body.classList.remove('focus-mode');
+        updateFocusNavbar();
+    }
+});
+
+/* keyboard navigation: move between shlokas while viewing analysis */
 document.addEventListener('keydown', (e)=>{
-    if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
     const activeTag = document.activeElement && document.activeElement.tagName;
     if(['INPUT','TEXTAREA','SELECT'].includes(activeTag)) return;
     if(!document.getElementById('view-analysis') || !document.getElementById('view-analysis').classList.contains('active')) return;
     if(document.getElementById('ed-rows')) return; // editor form open, not the analysis view
+
+    if(e.key==='Escape' && focusMode){ toggleFocusMode(); return; }
+
+    const prevKeys = ['ArrowLeft'].concat(focusMode ? ['ArrowUp','PageUp'] : []);
+    const nextKeys = ['ArrowRight'].concat(focusMode ? ['ArrowDown','PageDown'] : []);
+    if(!prevKeys.includes(e.key) && !nextKeys.includes(e.key)) return;
     if(!cur.nb) return;
-    if(e.key==='ArrowLeft' && cur.nb.prev) openVerse(cur.nb.prev);
-    if(e.key==='ArrowRight' && cur.nb.next) openVerse(cur.nb.next);
+    if(prevKeys.includes(e.key) && cur.nb.prev){ e.preventDefault(); openVerse(cur.nb.prev); }
+    if(nextKeys.includes(e.key) && cur.nb.next){ e.preventDefault(); openVerse(cur.nb.next); }
 });
 
 function renderAnalysis(g, v){
@@ -667,6 +740,7 @@ function renderAnalysis(g, v){
     const meta = verseRef(g, v);
     const nb = neighbourIds(g, v);
     cur.nb = nb;
+    updateFocusNavbar();
 
     // build grammar rows
     let rows = [], srcAuto = false;
@@ -718,6 +792,7 @@ function renderAnalysis(g, v){
         <div class="verse-nav">
             <button ${nb.prev?'':'disabled'} onclick="${nb.prev?`openVerse('${nb.prev}')`:''}">← पिछला श्लोक</button>
             <button onclick="backToChapter()">☰ श्लोक सूची</button>
+            <button onclick="toggleFocusMode()">${focusMode?'✕ फुल स्क्रीन से बाहर':'⛶ फुल स्क्रीन'}</button>
             <button ${nb.next?'':'disabled'} onclick="${nb.next?`openVerse('${nb.next}')`:''}">अगला श्लोक →</button>
         </div>
 
