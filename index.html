@@ -649,11 +649,24 @@ function neighbourIds(g, v){
     return { prev: idx>0?list[idx-1]._id:null, next: idx>=0&&idx<list.length-1?list[idx+1]._id:null };
 }
 
+/* keyboard navigation: ←/→ move between shlokas while viewing analysis */
+document.addEventListener('keydown', (e)=>{
+    if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
+    const activeTag = document.activeElement && document.activeElement.tagName;
+    if(['INPUT','TEXTAREA','SELECT'].includes(activeTag)) return;
+    if(!document.getElementById('view-analysis') || !document.getElementById('view-analysis').classList.contains('active')) return;
+    if(document.getElementById('ed-rows')) return; // editor form open, not the analysis view
+    if(!cur.nb) return;
+    if(e.key==='ArrowLeft' && cur.nb.prev) openVerse(cur.nb.prev);
+    if(e.key==='ArrowRight' && cur.nb.next) openVerse(cur.nb.next);
+});
+
 function renderAnalysis(g, v){
     const id = v._id;
     const ov = overrides[id] || {};
     const meta = verseRef(g, v);
     const nb = neighbourIds(g, v);
+    cur.nb = nb;
 
     // build grammar rows
     let rows = [], srcAuto = false;
