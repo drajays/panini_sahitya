@@ -789,6 +789,11 @@ function renderAnalysis(g, v){
             </div>
         </div>
 
+        <div class="meaning-card secondary animate-in">
+            <h4>💡 हिन्दी अर्थ ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
+            <p>${hindi || '<span class="empty-note">हिन्दी अर्थ अभी उपलब्ध नहीं — "विश्लेषण जोड़ें" से भरें।</span>'}</p>
+        </div>
+
         <div class="verse-nav">
             <button ${nb.prev?'':'disabled'} onclick="${nb.prev?`openVerse('${nb.prev}')`:''}">← पिछला श्लोक</button>
             <button onclick="backToChapter()">☰ श्लोक सूची</button>
@@ -799,7 +804,6 @@ function renderAnalysis(g, v){
         <div class="tabs">
             <button class="tab active" onclick="switchTab(this,'tab-vy')">📊 व्याकरण तालिका</button>
             <button class="tab" onclick="switchTab(this,'tab-anv')">📝 अन्वय</button>
-            <button class="tab" onclick="switchTab(this,'tab-arth')">💡 हिन्दी अर्थ</button>
         </div>
 
         <div class="tab-content active" id="tab-vy">
@@ -816,13 +820,6 @@ function renderAnalysis(g, v){
             <div class="meaning-card blue">
                 <h4>📜 अन्वय (Sanskrit)</h4>
                 <p>${anv || '<span class="empty-note">अन्वय उपलब्ध नहीं</span>'}</p>
-            </div>
-        </div>
-
-        <div class="tab-content" id="tab-arth">
-            <div class="meaning-card secondary">
-                <h4>💡 हिन्दी अर्थ ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
-                <p>${hindi || '<span class="empty-note">हिन्दी अर्थ अभी उपलब्ध नहीं — "विश्लेषण जोड़ें" से भरें।</span>'}</p>
             </div>
         </div>
     `;
