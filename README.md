@@ -18,7 +18,11 @@ Then open http://127.0.0.1:8777/index.html
 ## Data
 
 - `data/gita.json` — 700 verses **with full grammar analysis** from the repo (auto-rendered).
-- `data/bhagavatam.json` — 13,400+ verses, **verse text only** in the source repo.
+- `data/bhagavatam.json` — 13,400+ verses. Verse text (`v`) comes from the source repo;
+  Hindi meanings (`hs`, same convention as `gita.json`) are merged in locally — see
+  "Regenerating the Bhagavatam Hindi meanings" below. **Re-running the `curl` refresh
+  command further down will wipe the `hs` fields** — re-run the Hindi-meaning script
+  afterwards to restore them.
 - `data/bhagavatam-analysis/skandha-N.json` — **machine-generated** grammar for
   Bhagavatam (12 files, lazy-loaded per skandha). Produced locally with the
   [vidyut](https://github.com/ambuda-org/vidyut) Sanskrit toolkit: each surface word is
@@ -37,7 +41,20 @@ python3 -m venv .venv
 ```
 (The `.venv/` folder is large and local-only; safe to delete after generating.)
 
-Source: https://github.com/sanskritsahitya-com/data — refresh with:
+### Regenerating the Bhagavatam Hindi meanings
+
+```bash
+python3 tools/generate_bhagavatam_hindi.py
+```
+
+Extracts Hindi verse meanings (`hs` field) from the Gita Press
+"Srimad Bhagavat Mahapuran" Sanskrit-Hindi OCR text (two djvu-scanned volumes,
+expected at `~/srimad-bhagavat-mahapuran-2-volume-set-sanskrit-hindi/`) and merges
+them into `data/bhagavatam.json`. The OCR is noisy, so this is a best-effort
+heuristic extractor (~88% verse coverage) — see the module docstring in the script
+for the method and its known limitations.
+
+Source: https://github.com/sanskritsahitya-com/data — refresh verse text with:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/sanskritsahitya-com/data/master/srimadbhagavadgita/srimadbhagavadgita.json -o data/gita.json
