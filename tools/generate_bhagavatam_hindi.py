@@ -72,6 +72,10 @@ HINDI_WORDS = set('''है हैं था थे थी हुआ हुई �
 
 HINDI_SCORE_THRESHOLD = 0.08
 MIN_SEGMENT_WORDS = 3
+MAX_SEGMENT_WORDS = 300  # real per-verse meanings run well under this
+                         # (p99 ~150 words); longer segments are almost
+                         # always leftover front matter/table-of-contents
+                         # that got merged in ahead of a missed marker
 
 
 def to_int(devnum):
@@ -155,6 +159,25 @@ def parse_colophon(paragraph, match_end):
     return skandha, chapter
 
 
+def trim_front_matter(buf_paragraphs):
+    """The text preceding a volume's first colophon is a mix of real front
+    matter (title pages, publisher's preface, a full table of contents for
+    the volume) and the opening chapter's own content, with no marker to
+    tell them apart - except that the opening chapter's own verse-1 "।।१।।"
+    marker cannot occur anywhere in the front matter (front matter prose
+    and table-of-contents numbering don't use that danda-wrapped form), so
+    its last occurrence is a reliable boundary. Keep from a bit before it
+    onward; drop everything earlier."""
+    joined = ' '.join(buf_paragraphs)
+    last = None
+    for mm in MARK_RE.finditer(joined):
+        if mm.group(2) is None and to_int(mm.group(1)) == 1:
+            last = mm
+    if last is None:
+        return []
+    return [joined[max(0, last.start() - 800):]]
+
+
 def extract_hindi_map(paragraphs):
     """Walk paragraphs, tracking skandha/chapter via colophons, and pull
     Hindi-meaning segments keyed by 'skandha.chapter|versenum'."""
@@ -172,8 +195,9 @@ def extract_hindi_map(paragraphs):
         i = 0
         while i + 2 < len(parts):
             segment, num1, num1b = parts[i], parts[i + 1], parts[i + 2]
+            word_count = len(segment.split()) if segment else 0
             if segment and hindi_score(segment) >= HINDI_SCORE_THRESHOLD \
-                    and len(segment.split()) >= MIN_SEGMENT_WORDS:
+                    and MIN_SEGMENT_WORDS <= word_count <= MAX_SEGMENT_WORDS:
                 lo = to_int(num1)
                 hi = to_int(num1b) if num1b else lo
                 text = clean_segment(segment)
@@ -202,12 +226,19 @@ def extract_hindi_map(paragraphs):
                     # marker digits weren't found (OCR gap): assume the
                     # chapter count just advanced by one within the skandha
                     new_chapter = chapter + 1 if new_skandha == skandha else 1
-                # The buffer preceding the very first colophon in a volume
-                # is front matter (publisher's preface, dedication, etc.),
-                # not chapter content - discard it rather than mislabel it
-                # as the first chapter's meaning.
                 if seen_first_colophon:
                     flush(buffer, new_skandha, new_chapter)
+                else:
+                    # The buffer preceding a volume's very first colophon is
+                    # a mix of front matter and the opening chapter's own
+                    # content - try to recover the latter. Trim on the
+                    # content alone (excluding the colophon paragraph p
+                    # itself, just appended above), since p's own trailing
+                    # "...ऽध्यायः ।।१।।" chapter-number marker would
+                    # otherwise be mistaken for the real verse-1 marker, as
+                    # it's the last thing in the buffer.
+                    trimmed = trim_front_matter(buffer[:-1])
+                    flush(trimmed + [p], new_skandha, new_chapter)
                 seen_first_colophon = True
                 skandha, chapter = new_skandha, new_chapter
             elif seen_first_colophon:
