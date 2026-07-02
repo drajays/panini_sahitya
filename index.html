@@ -256,6 +256,7 @@
         <div class="nav-item" data-nav="gita" onclick="openGrantha('gita')">🎵 भगवद्गीता</div>
         <div class="nav-item" data-nav="bhagavatam" onclick="openGrantha('bhagavatam')">🌸 श्रीमद्भागवत</div>
         <div class="nav-item" data-nav="chalisa" onclick="openGrantha('chalisa')">🚩 हनुमान चालीसा</div>
+        <div class="nav-item" data-nav="manas" onclick="openGrantha('manas')">🏹 रामचरितमानस</div>
         <div class="nav-item" data-nav="about" onclick="go('about')">ℹ️ परिचय</div>
     </nav>
 </header>
@@ -293,6 +294,11 @@
                 <div class="sidebar-item-icon" style="background:#fbe9e7">🚩</div>
                 <div class="sidebar-item-text"><div class="title">हनुमान चालीसा</div><div class="subtitle">Hanuman Chalisa · ४३ श्लोक</div></div>
                 <span class="sidebar-badge">43</span>
+            </div>
+            <div class="sidebar-item" data-grantha="manas" onclick="openGrantha('manas')">
+                <div class="sidebar-item-icon" style="background:#fff8e1">🏹</div>
+                <div class="sidebar-item-text"><div class="title">रामचरितमानस</div><div class="subtitle">Ramcharitmanas · 7 काण्ड</div></div>
+                <span class="sidebar-badge">1k</span>
             </div>
         </div>
         <div class="sidebar-section">
@@ -343,6 +349,12 @@
                     <h3>श्री हनुमान चालीसा</h3>
                     <p>गोस्वामी तुलसीदास कृत ४३ दोहे एवं चौपाइयाँ — सरल अर्थ, विस्तृत आध्यात्मिक व्याख्या एवं प्रश्नोत्तर।</p>
                     <div class="tc-count">व्याख्या एवं प्रश्नोत्तर ✓</div>
+                </div>
+                <div class="tree-card animate-in" onclick="openGrantha('manas')">
+                    <div class="tc-num">🏹 RAMCHARITMANAS</div>
+                    <h3>श्री रामचरितमानस</h3>
+                    <p>गोस्वामी तुलसीदास कृत ७ काण्ड — बालकाण्ड से उत्तरकाण्ड तक १०७३ दोहे एवं चौपाइयाँ।</p>
+                    <div class="tc-count">मूल पाठ उपलब्ध ✓</div>
                 </div>
             </div>
             <div class="section-title">🔖 प्रमुख श्लोक</div>
@@ -423,7 +435,10 @@ const SOURCES = {
                   cdn:'./data/bhagavatam.json' },
     chalisa:    { title:'श्री हनुमान चालीसा', icon:'🚩',
                   local:'./data/chalisa.json',
-                  cdn:'./data/chalisa.json' }
+                  cdn:'./data/chalisa.json' },
+    manas:      { title:'श्री रामचरितमानस', icon:'🏹',
+                  local:'./data/manas.json',
+                  cdn:'./data/manas.json' }
 };
 
 /* ---- grammar code decoders ---- */
