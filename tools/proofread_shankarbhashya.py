@@ -92,14 +92,27 @@ CORPUS_FIXES = [
     ('श्लोकद्ठारा', 'श्लोकद्वारा'), ('द्ठारा', 'द्वारा'),
     ('भगवानने', 'भगवान्ने'),
     ('क्‍या', 'क्या'),
+    ('ःः', 'ः'), ('संन््यासी', 'संन्यासी'), ('संनन््यासी', 'संन्यासी'), ('न््य', 'न्य'),
+    ('पुरुषो५एनुते', 'पुरुषोऽश्नुते'), ('चिन्त्योडयम्', 'चिन्त्योऽयम्'),
+    ('हिंसात्मको५डशचिः', 'हिंसात्मकोऽशुचिः'), ('प्राणेड५पानं', 'प्राणेऽपानं'),
+    ('(५त्तरार्ध', '(उत्तरार्ध'),
+]
+
+CORPUS_RE_FIXES = [
+    # avagraha misread as digit ५ after ो/े (e.g. यन्मनो५नुविधीयते)
+    (re.compile(r'([ोे]) ?५(?=[अ-ह])'), r'\1ऽ'),
 ]
 
 
-def apply_fixes(text, fixes):
+def apply_fixes(text, fixes, regexes=()):
     for a, b in fixes:
         text = text.replace(a, b)
+    for rx, b in regexes:
+        text = rx.sub(b, text)
     # collapse doubled spaces that replacements may create
     text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r'\n ', '\n', text)
+    text = re.sub(r'\n{2,}', '\n', text)
     return text
 
 
@@ -113,7 +126,7 @@ def main():
         if f.exists():
             chfixes = json.load(open(f))
         for n in list(verses):
-            t = apply_fixes(verses[n], CORPUS_FIXES)
+            t = apply_fixes(verses[n], CORPUS_FIXES, CORPUS_RE_FIXES)
             t = apply_fixes(t, chfixes)
             verses[n] = t.strip()
 

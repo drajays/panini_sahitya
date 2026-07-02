@@ -255,6 +255,7 @@
         <div class="nav-item active" data-nav="home" onclick="go('home')">🏠 मुखपृष्ठ</div>
         <div class="nav-item" data-nav="gita" onclick="openGrantha('gita')">🎵 भगवद्गीता</div>
         <div class="nav-item" data-nav="bhagavatam" onclick="openGrantha('bhagavatam')">🌸 श्रीमद्भागवत</div>
+        <div class="nav-item" data-nav="chalisa" onclick="openGrantha('chalisa')">🚩 हनुमान चालीसा</div>
         <div class="nav-item" data-nav="about" onclick="go('about')">ℹ️ परिचय</div>
     </nav>
 </header>
@@ -288,6 +289,11 @@
                 <div class="sidebar-item-text"><div class="title">श्रीमद्भागवत</div><div class="subtitle">Bhagavatam · 12 स्कन्ध</div></div>
                 <span class="sidebar-badge">18k</span>
             </div>
+            <div class="sidebar-item" data-grantha="chalisa" onclick="openGrantha('chalisa')">
+                <div class="sidebar-item-icon" style="background:#fbe9e7">🚩</div>
+                <div class="sidebar-item-text"><div class="title">हनुमान चालीसा</div><div class="subtitle">Hanuman Chalisa · ४३ श्लोक</div></div>
+                <span class="sidebar-badge">43</span>
+            </div>
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-title">मेरा कार्य</div>
@@ -309,6 +315,7 @@
                 <div class="hero-stats">
                     <div class="hero-stat"><div class="num">700</div><div class="label">गीता श्लोक</div></div>
                     <div class="hero-stat"><div class="num">13,000+</div><div class="label">भागवत श्लोक</div></div>
+                    <div class="hero-stat"><div class="num">43</div><div class="label">चालीसा पद</div></div>
                     <div class="hero-stat"><div class="num" id="stat-overrides">0</div><div class="label">आपका विश्लेषण</div></div>
                 </div>
             </div>
@@ -325,6 +332,12 @@
                     <h3>श्रीमद्भागवत महापुराण</h3>
                     <p>१२ स्कन्ध · १३,४०० से अधिक श्लोक — मूल श्लोक उपलब्ध; व्याकरण व अर्थ आप जोड़ेंगे।</p>
                     <div class="tc-count">श्लोक तैयार · विश्लेषण जोड़ें</div>
+                </div>
+                <div class="tree-card animate-in" onclick="openGrantha('chalisa')">
+                    <div class="tc-num">🚩 HANUMAN CHALISA</div>
+                    <h3>श्री हनुमान चालीसा</h3>
+                    <p>गोस्वामी तुलसीदास कृत ४३ दोहे एवं चौपाइयाँ — सरल अर्थ, विस्तृत आध्यात्मिक व्याख्या एवं प्रश्नोत्तर।</p>
+                    <div class="tc-count">व्याख्या एवं प्रश्नोत्तर ✓</div>
                 </div>
             </div>
             <div class="section-title">🔖 प्रमुख श्लोक</div>
@@ -402,7 +415,10 @@ const SOURCES = {
                   cdn:'https://cdn.jsdelivr.net/gh/sanskritsahitya-com/data@master/srimadbhagavadgita/srimadbhagavadgita.json' },
     bhagavatam: { title:'श्रीमद्भागवत महापुराण', icon:'🌸',
                   local:'./data/bhagavatam.json',
-                  cdn:'https://cdn.jsdelivr.net/gh/sanskritsahitya-com/data@master/srimadbhagavatam/srimadbhagavatam.json' }
+                  cdn:'https://cdn.jsdelivr.net/gh/sanskritsahitya-com/data@master/srimadbhagavatam/srimadbhagavatam.json' },
+    chalisa:    { title:'श्री हनुमान चालीसा', icon:'🚩',
+                  local:'./data/chalisa.json',
+                  cdn:'./data/chalisa.json' }
 };
 
 /* ---- grammar code decoders ---- */
@@ -592,15 +608,16 @@ function renderChapters(g, bookNum){
         trail.push({label:(g.terms.bookSg||'स्कन्ध')+' '+bookNum+' — '+(b?b.name:'')});
     } else { trail[1] = {label:g.title}; }
     crumb(trail);
-    const chSg = g.terms.chapterSg || 'अध्याय';
+    const chSg = (g.terms && g.terms.chapterSg) || 'अध्याय';
+    const verseSg = (g.terms && g.terms.verseSg) || 'श्लोक';
     const html = chs.map(c=>{
         const verses = (g.byChapter[c.number]||[]).filter(e=>e.v && e.n!=null);
         return `
         <div class="tree-card animate-in" onclick="openChapter('${c.number}')">
             <div class="tc-num">${chSg.toUpperCase()} ${c.number}</div>
-            <h3>${c.name||('अध्याय '+c.number)}</h3>
+            <h3>${c.name||(chSg+' '+c.number)}</h3>
             ${c.subtitle?`<p>${c.subtitle}</p>`:''}
-            <div class="tc-count">${verses.length} श्लोक</div>
+            <div class="tc-count">${verses.length} ${verseSg}</div>
         </div>`;
     }).join('');
     document.getElementById('browse-body').innerHTML =
@@ -636,11 +653,12 @@ function renderVerses(g, chNum){
         if(overrides[id])       badge = '<span class="vr-badge badge-done">आपका विश्लेषण ✓</span>';
         else if(e.pc)           badge = '<span class="vr-badge badge-auto">व्याकरण ✓</span>';
         else if(hasAutoGrammar(autoRowsFor(g.key,e))) badge = '<span class="vr-badge badge-auto">स्वतः · जाँचें</span>';
+        else if(e.hs || e.sb || (e.qa && e.qa.length)) badge = '<span class="vr-badge badge-auto">व्याख्या उपलब्ध ✓</span>';
         else                    badge = '<span class="vr-badge badge-todo">विश्लेषण जोड़ें</span>';
         return `
         <div class="verse-row animate-in" onclick="openVerse('${id}')">
             <div class="vr-num">${chNum}.${e.n}</div>
-            <div class="vr-text">${e.v}</div>
+            <div class="vr-text">${e.title?`<span style="font-size:0.8rem;color:var(--saffron);font-weight:600;display:block;margin-bottom:2px">${e.title}</span>`:''}${e.v}</div>
             ${badge}
         </div>`;
     }).join('');
@@ -667,7 +685,7 @@ function verseRef(g, v){
     const bookNum = String(v.c).includes('.') ? String(v.c).split('.')[0] : null;
     let ref = '';
     if(bookNum) ref = (g.terms.bookSg?'':'स्कन्ध ')+v.c+'.'+v.n;
-    else ref = 'अध्याय '+v.c+' · श्लोक '+v.n;
+    else ref = ((g.terms && g.terms.chapterSg) || 'अध्याय')+' '+v.c+' · '+((g.terms && g.terms.verseSg) || 'श्लोक')+' '+v.n;
     return { ref, chName: chObj?chObj.name:'' };
 }
 
@@ -794,20 +812,21 @@ function renderAnalysis(g, v){
         <div class="shlok-header-card animate-in">
             <span class="shlok-source-badge">${SOURCES[g.key].icon} ${g.title} · ${meta.ref}</span>
             ${meta.chName?`<div class="shlok-title-main">${meta.chName}</div>`:''}
+            ${v.title?`<div style="font-size:0.95rem;color:var(--saffron);font-weight:600;margin-top:8px">${v.title}</div>`:''}
             <div class="shlok-devanagari">
                 ${v.v.split(/[।॥]\s*/).filter(Boolean).map((l,i,a)=>`<p>${l}${i<a.length-1?' ।':' ॥'}</p>`).join('')}
             </div>
         </div>
 
         <div class="meaning-card secondary animate-in">
-            <h4>💡 हिन्दी अर्थ ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
+            <h4>💡 ${g.custom && g.custom.hs ? g.custom.hs.name : 'हिन्दी अर्थ'} ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
             <p>${hindi || '<span class="empty-note">हिन्दी अर्थ अभी उपलब्ध नहीं — "विश्लेषण जोड़ें" से भरें।</span>'}</p>
         </div>
 
         ${sb ? `
         <div class="meaning-card animate-in">
-            <h4>📜 शांकरभाष्य (हिन्दी — गीताप्रेस)</h4>
-            <div class="sb-text">${sb.split('\n').map(p=>`<p>${p}</p>`).join('')}</div>
+            <h4>📜 ${g.custom && g.custom.sb ? g.custom.sb.name : 'शांकरभाष्य (हिन्दी — गीताप्रेस)'}</h4>
+            <div class="sb-text">${sb.split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('')}</div>
         </div>` : ''}
 
         ${qa.length ? `
@@ -1006,7 +1025,7 @@ async function runSearch(q){
 
 /* ---- featured on home ---- */
 async function renderFeatured(){
-    const feats=[ {k:'gita',id:'gita|2|47'}, {k:'gita',id:'gita|9|22'}, {k:'bhagavatam',id:'bhagavatam|1.1|1'} ];
+    const feats=[ {k:'gita',id:'gita|2|47'}, {k:'gita',id:'gita|9|22'}, {k:'bhagavatam',id:'bhagavatam|1.1|1'}, {k:'chalisa',id:'chalisa|1|1'} ];
     const cards=[];
     for(const f of feats){
         try{
@@ -1016,7 +1035,7 @@ async function renderFeatured(){
                 <div class="tree-card animate-in" onclick="openVerse('${f.id}')">
                     <div class="tc-num">${SOURCES[f.k].icon} ${g.title} · ${meta.ref}</div>
                     <h3 style="font-size:.98rem">${v.v.split(/[।॥]/)[0]}…</h3>
-                    <div class="tc-count">${v.pc?'पूर्ण व्याकरण विश्लेषण':'मूल श्लोक'}</div>
+                    <div class="tc-count">${v.pc?'पूर्ण व्याकरण विश्लेषण':(v.sb||v.hs||v.qa?'व्याख्या एवं प्रश्नोत्तर':'मूल श्लोक')}</div>
                 </div>`);
         }catch(e){}
     }
