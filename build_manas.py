@@ -2,52 +2,54 @@ import os
 import json
 
 def build_manas():
-    src_dir = '/Users/dr.ajayshukla/Downloads/sanskrit_text_gitasupersite-master/ramcharitmanas'
+    src_dir = '/Users/dr.ajayshukla/Downloads/DharmicData-main/Ramcharitmanas'
     
     kandas = [
-        ('1', 'baal_kaanda', 'बालकाण्ड', 'श्री राम जन्मोत्सव, विश्वामित्र यज्ञ रक्षा एवं सीता स्वयंवर (३६२ दोहे)'),
-        ('2', 'ayodhya_kaanda', 'अयोध्याकाण्ड', 'श्री राम राज्याभिषेक तैयारी, वनवास एवं भरत मिलाप (३२७ दोहे)'),
-        ('3', 'aranya_kaanda', 'अरण्यकाण्ड', 'पंचवटी निवास, शूर्पणखा प्रसंग, सीता हरण एवं शबरी अनुग्रह (४७ दोहे)'),
-        ('4', 'kishkindha_kaanda', 'किष्किन्धाकाण्ड', 'हनुमान मिलन, सुग्रीव मैत्री, बालि वध एवं सीता खोज (३१ दोहे)'),
-        ('5', 'sundara_kaanda', 'सुन्दरकाण्ड', 'हनुमान जी की लंका यात्रा, सीता आश्वासन, लंका दहन एवं विभीषण शरणागति (६१ दोहे)'),
-        ('6', 'lanka_kaanda', 'लंकाकाण्ड', 'राम-रावण युद्ध, कुम्भकर्ण व मेघनाद वध एवं रावण संहार (१२२ दोहे)'),
-        ('7', 'uttara_kaanda', 'उत्तरकाण्ड', 'श्री राम राज्याभिषेक, राम राज्य, काकभुशुण्डि-गरुड़ संवाद एवं रामगीता (१३१ दोहे)')
+        ('1', '1_बाल_काण्ड_data.json', 'बालकाण्ड', 'श्री राम जन्मोत्सव, विश्वामित्र यज्ञ रक्षा एवं सीता स्वयंवर (३६२ दोहे)'),
+        ('2', '2_अयोध्या_काण्ड_data.json', 'अयोध्याकाण्ड', 'श्री राम राज्याभिषेक तैयारी, वनवास एवं भरत मिलाप (३२७ दोहे)'),
+        ('3', '3_अरण्य_काण्ड_data.json', 'अरण्यकाण्ड', 'पंचवटी निवास, शूर्पणखा प्रसंग, सीता हरण एवं शबरी अनुग्रह (४७ दोहे)'),
+        ('4', '4_किष्किन्धा_काण्ड_data.json', 'किष्किन्धाकाण्ड', 'हनुमान मिलन, सुग्रीव मैत्री, बालि वध एवं सीता खोज (३१ दोहे)'),
+        ('5', '5_सुंदर_काण्ड_data.json', 'सुन्दरकाण्ड', 'हनुमान जी की लंका यात्रा, सीता आश्वासन, लंका दहन एवं विभीषण शरणागति (६१ दोहे)'),
+        ('6', '6_लंका_काण्ड_data.json', 'लंकाकाण्ड', 'राम-रावण युद्ध, कुम्भकर्ण व मेघनाद वध एवं रावण संहार (१२२ दोहे)'),
+        ('7', '7_उत्तर_काण्ड_data.json', 'उत्तरकाण्ड', 'श्री राम राज्याभिषेक, राम राज्य, काकभुशुण्डि-गरुड़ संवाद एवं रामगीता (१३१ दोहे)')
     ]
     
     chapters = []
     data = []
     
-    for num, folder, name, subtitle in kandas:
+    for num, filename, name, subtitle in kandas:
         chapters.append({
             "number": num,
             "name": name,
             "subtitle": subtitle
         })
         
-        c_path = os.path.join(src_dir, folder, 'chopayi.txt')
-        d_path = os.path.join(src_dir, folder, 'doha.txt')
-        
-        c_list = open(c_path, encoding='utf-8').read().split('--x--') if os.path.exists(c_path) else []
-        d_list = open(d_path, encoding='utf-8').read().split('--x--') if os.path.exists(d_path) else []
-        
-        n_blocks = max(len(c_list), len(d_list))
-        for i in range(n_blocks):
-            chop = c_list[i].strip() if i < len(c_list) else ""
-            doh = d_list[i].strip() if i < len(d_list) else ""
-            if not chop and not doh:
-                continue
-            comb = f"{chop}\n\n{doh}" if chop and doh else (chop or doh)
-            data.append({
-                "c": num,
-                "n": str(i + 1),
-                "v": comb
-            })
+        file_path = os.path.join(src_dir, filename)
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                kand_data = json.load(f)
+                
+            for i, item in enumerate(kand_data):
+                v_type = item.get("type", "")
+                content = item.get("content", "").strip()
+                if not content:
+                    continue
+                
+                comb = f"[{v_type}]\n{content}" if v_type else content
+                
+                data.append({
+                    "c": num,
+                    "n": str(i + 1),
+                    "v": comb
+                })
+        else:
+            print(f"Warning: {file_path} not found.")
             
     manas_json = {
         "title": "श्री रामचरितमानस",
         "terms": {
             "chapterSg": "काण्ड",
-            "verseSg": "दोहा/चौपाई",
+            "verseSg": "छंद/दोहा/चौपाई",
             "bookSg": "भाग"
         },
         "custom": {
@@ -60,6 +62,7 @@ def build_manas():
     }
     
     out_path = '/Users/dr.ajayshukla/Panini_sahitya/data/manas.json'
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(manas_json, f, ensure_ascii=False, indent=2)
         
