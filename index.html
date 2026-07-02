@@ -417,10 +417,10 @@
 const SOURCES = {
     gita:       { title:'श्रीमद्भगवद्गीता', icon:'🎵',
                   local:'./data/gita.json',
-                  cdn:'https://cdn.jsdelivr.net/gh/sanskritsahitya-com/data@master/srimadbhagavadgita/srimadbhagavadgita.json' },
+                  cdn:'./data/gita.json' },
     bhagavatam: { title:'श्रीमद्भागवत महापुराण', icon:'🌸',
                   local:'./data/bhagavatam.json',
-                  cdn:'https://cdn.jsdelivr.net/gh/sanskritsahitya-com/data@master/srimadbhagavatam/srimadbhagavatam.json' },
+                  cdn:'./data/bhagavatam.json' },
     chalisa:    { title:'श्री हनुमान चालीसा', icon:'🚩',
                   local:'./data/chalisa.json',
                   cdn:'./data/chalisa.json' }
@@ -473,7 +473,7 @@ async function loadAuto(grantha, skandha){
     if(grantha!=='bhagavatam') return null;
     const ck = grantha+':'+skandha;
     if(autoCache[ck]!==undefined) return autoCache[ck];
-    const param = window.location.search || '';
+    const param = window.location.search || ('?v=' + Date.now());
     try{ const r=await fetch(`./data/bhagavatam-analysis/skandha-${skandha}.json` + param); autoCache[ck]= r.ok? await r.json() : null; }
     catch(e){ autoCache[ck]=null; }
     return autoCache[ck];
@@ -539,7 +539,7 @@ async function forceUpdateApp() {
 async function loadGrantha(key){
     if(cache[key]) return cache[key];
     const src = SOURCES[key];
-    const param = window.location.search || '';
+    const param = window.location.search || ('?v=' + Date.now());
     let json;
     try{
         const r = await fetch(src.local + param);
