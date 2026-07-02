@@ -153,6 +153,8 @@
     .meaning-card p{color:#333;line-height:1.9;font-size:.95rem;white-space:pre-wrap}
     .meaning-card .empty-note{color:#aa8;font-style:italic}
     .meaning-card.purple{border-left-color:var(--purple-accent)}
+    .sb-text p{margin-bottom:10px}
+    .sb-text p:last-child{margin-bottom:0}
     .qa-list{display:flex;flex-direction:column;gap:16px}
     .qa-item{border-bottom:1px dashed var(--border-light);padding-bottom:14px}
     .qa-item:last-child{border-bottom:none;padding-bottom:0}
@@ -786,6 +788,7 @@ function renderAnalysis(g, v){
     const hindi = ov.hindi || v.hs || '';
     const anv   = v.anv || '';
     const qa    = v.qa || [];
+    const sb    = v.sb || '';
 
     const html = `
         <div class="shlok-header-card animate-in">
@@ -800,6 +803,12 @@ function renderAnalysis(g, v){
             <h4>💡 हिन्दी अर्थ ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
             <p>${hindi || '<span class="empty-note">हिन्दी अर्थ अभी उपलब्ध नहीं — "विश्लेषण जोड़ें" से भरें।</span>'}</p>
         </div>
+
+        ${sb ? `
+        <div class="meaning-card animate-in">
+            <h4>📜 शांकरभाष्य (हिन्दी — गीताप्रेस)</h4>
+            <div class="sb-text">${sb.split('\n').map(p=>`<p>${p}</p>`).join('')}</div>
+        </div>` : ''}
 
         ${qa.length ? `
         <div class="meaning-card purple animate-in">
