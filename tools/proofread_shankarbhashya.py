@@ -102,6 +102,7 @@ CORPUS_FIXES = [
 CORPUS_RE_FIXES = [
     # avagraha misread as digit ५ after ो/े (e.g. यन्मनो५नुविधीयते)
     (re.compile(r'([ोे]) ?५(?=[अ-ह])'), r'\1ऽ'),
+    (re.compile(r'अग्रि(?!म)'), 'अग्नि'),
 ]
 
 
