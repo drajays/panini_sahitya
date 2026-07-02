@@ -318,6 +318,11 @@
                     <div class="hero-stat"><div class="num">43</div><div class="label">चालीसा पद</div></div>
                     <div class="hero-stat"><div class="num" id="stat-overrides">0</div><div class="label">आपका विश्लेषण</div></div>
                 </div>
+                <div style="margin-top:24px;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <button class="btn-header primary" id="btn-app-update" onclick="forceUpdateApp()" style="padding:10px 24px;font-size:0.95rem;border-radius:25px;box-shadow:0 4px 14px rgba(224,86,36,0.25);transition:all 0.3s ease;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+                        <span>🔄</span><span>ऐप एवं डेटा अपडेट करें (Refresh Data)</span>
+                    </button>
+                </div>
             </div>
             <div class="section-title">📖 ग्रन्थ चुनें</div>
             <div class="cards-grid">
@@ -468,7 +473,8 @@ async function loadAuto(grantha, skandha){
     if(grantha!=='bhagavatam') return null;
     const ck = grantha+':'+skandha;
     if(autoCache[ck]!==undefined) return autoCache[ck];
-    try{ const r=await fetch(`./data/bhagavatam-analysis/skandha-${skandha}.json`); autoCache[ck]= r.ok? await r.json() : null; }
+    const param = window.location.search || '';
+    try{ const r=await fetch(`./data/bhagavatam-analysis/skandha-${skandha}.json` + param); autoCache[ck]= r.ok? await r.json() : null; }
     catch(e){ autoCache[ck]=null; }
     return autoCache[ck];
 }
@@ -498,17 +504,49 @@ function refreshOverrideBadges(){
     document.getElementById('stat-overrides').textContent = n;
 }
 
+/* ---- app refresh / update ---- */
+async function forceUpdateApp() {
+    const btns = document.querySelectorAll('button[onclick="forceUpdateApp()"]');
+    btns.forEach(b => {
+        b.innerHTML = '⏳ अपडेट हो रहा है...';
+        b.disabled = true;
+        b.style.opacity = '0.7';
+    });
+    for (let k in cache) delete cache[k];
+    if (typeof autoCache !== 'undefined') {
+        for (let k in autoCache) delete autoCache[k];
+    }
+    if ('caches' in window) {
+        try {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+        } catch(e) {}
+    }
+    if ('serviceWorker' in navigator) {
+        try {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let reg of regs) await reg.update();
+        } catch(e) {}
+    }
+    setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('v', Date.now());
+        window.location.href = url.toString();
+    }, 400);
+}
+
 /* ---- data loading + indexing ---- */
 async function loadGrantha(key){
     if(cache[key]) return cache[key];
     const src = SOURCES[key];
+    const param = window.location.search || '';
     let json;
     try{
-        const r = await fetch(src.local);
+        const r = await fetch(src.local + param);
         if(!r.ok) throw new Error('local');
         json = await r.json();
     }catch(e){
-        const r = await fetch(src.cdn);
+        const r = await fetch(src.cdn + param);
         json = await r.json();
     }
     cache[key] = indexGrantha(json, key);
