@@ -157,10 +157,10 @@
     .cs-word{cursor:pointer;text-underline-offset:.32em}
     .cw1{color:var(--cw1)}.cw2{color:var(--cw2)}.cw3{color:var(--cw3)}.cw4{color:var(--cw4)}
     .cw5{color:var(--cw5)}.cw6{color:var(--cw6)}.cw7{color:var(--cw7)}
-    .ul1,.ul2,.ul3,.ul4,.ul5,.ul6,.ul7{text-decoration-line:underline;text-decoration-thickness:3px;text-decoration-style:solid}
+    .ul0,.ul1,.ul2,.ul3,.ul4,.ul5,.ul6,.ul7{text-decoration-line:underline;text-decoration-thickness:3px;text-decoration-style:solid}
     .ul1{text-decoration-color:var(--cw1)}.ul2{text-decoration-color:var(--cw2)}.ul3{text-decoration-color:var(--cw3)}
     .ul4{text-decoration-color:var(--cw4)}.ul5{text-decoration-color:var(--cw5)}.ul6{text-decoration-color:var(--cw6)}
-    .ul7{text-decoration-color:var(--cw7)}
+    .ul7{text-decoration-color:var(--cw7)}.ul0{text-decoration-color:#1a1a1a}
     .u-atma{text-decoration-style:dashed}
     .krid{text-decoration-line:underline;text-decoration-color:var(--cwK);text-decoration-thickness:1.5px}
 
@@ -551,7 +551,7 @@ function wordColorCls(r){
         let noun=null, verb=null;
         for(const p of r.parts){ if(p.cn) noun=p; if(p.pn!=null) verb=p; }
         if(verb){
-            cls.push(LAK_UL[verb.t]||'ul7');
+            cls.push(LAK_UL[verb.t]||'ul0');           // अज्ञात लकार → काली रेखा
             if((verb.pp||'')[0]==='A') cls.push('u-atma');
         } else if(noun){
             const a=Number(String(noun.cn).split('.')[0]);
@@ -562,6 +562,7 @@ function wordColorCls(r){
         const first=(r.gram||'').split(' · ')[0];
         if(LAK_UL[first]){ cls.push(LAK_UL[first]); if((r.gram||'').includes('आत्मनेपद')) cls.push('u-atma'); }
         else if(VIB2CW[first]) cls.push(VIB2CW[first]);
+        else if(r.cls==='vk') cls.push('ul0');         // क्रियापद, पर लकार अज्ञात → काली रेखा
     }
     return cls.join(' ');
 }
@@ -608,7 +609,8 @@ function renderColorShloka(id, rows){
                 </div>
                 <div class="cs-legend-note">
                     <span class="ul1">ठोस रेखा</span> = परस्मैपद &nbsp;·&nbsp; <span class="ul1 u-atma">डैश रेखा</span> = आत्मनेपद &nbsp;·&nbsp;
-                    <span class="cw1 krid">रंगीन पद + पतली लाल रेखा</span> = कृदन्त (क्त · शतृ · सन् आदि — विभक्ति का रंग, क्रिया की रेखा)
+                    <span class="cw1 krid">रंगीन पद + पतली लाल रेखा</span> = कृदन्त (क्त · शतृ · सन् आदि — विभक्ति का रंग, क्रिया की रेखा) &nbsp;·&nbsp;
+                    <span class="ul0">काली रेखा</span> = अवर्गीकृत / अज्ञात लकार का क्रियापद
                 </div>
             </div>
         </details>
