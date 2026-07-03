@@ -13,6 +13,9 @@
         --cream:#FEFAE0; --dark-brown:#3D1C02; --medium-brown:#6B3A2A; --light-brown:#A0522D;
         --green-accent:#2D6A4F; --blue-accent:#1B4F72; --purple-accent:#5B2C6F;
         --text-dark:#1a0a00; --text-medium:#4a2500; --border-light:#E8C99A; --shadow:rgba(61,28,2,0.15);
+        /* व्याकरण रंग-कूट (VIBGYOR): 1 प्रथमा … 7 सप्तमी; K = कृदन्त */
+        --cw1:#7B2CBF; --cw2:#3F37C9; --cw3:#1976D2; --cw4:#2E7D32;
+        --cw5:#B8860B; --cw6:#E65100; --cw7:#C62828; --cwK:#D32F2F;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Georgia','Times New Roman',serif;background:linear-gradient(135deg,#FFF8F0 0%,#FEFAE0 50%,#FFF3E0 100%);min-height:100vh;color:var(--text-dark)}
@@ -141,13 +144,45 @@
     tbody tr:hover{background:#FFF8F0}
     tbody tr:last-child{border-bottom:none}
     td{padding:11px 14px;font-size:.85rem;color:var(--text-dark);vertical-align:top}
-    td.pad-cell{font-weight:bold;color:var(--deep-saffron);font-size:.95rem;cursor:pointer;text-decoration:underline dotted;white-space:nowrap}
+    td.pad-cell{font-weight:bold;color:var(--deep-saffron);font-size:.95rem;cursor:pointer;white-space:nowrap}
     td .deriv{display:block;font-size:.72rem;color:#999;font-weight:normal;margin-top:2px}
     td .karaka{display:block;font-size:.72rem;color:var(--green-accent);margin-top:2px}
     .chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:.72rem;font-weight:bold;white-space:nowrap}
-    .v1{background:#E3F2FD;color:#1565C0}.v2{background:#E8F5E9;color:#2E7D32}.v3{background:#FFF3E0;color:#E65100}
-    .v4{background:#FCE4EC;color:#880E4F}.v5{background:#F3E5F5;color:#6A1B9A}.v6{background:#E0F2F1;color:#004D40}
-    .v7{background:#FFF8E1;color:#FF6F00}.v8{background:#EDE7F6;color:#4527A0}.vk{background:#FFEBEE;color:#B71C1C}.avyaya{background:#F5F5F5;color:#424242}
+    /* विभक्ति chips — रंगीन-पदच्छेद की VIBGYOR योजना के अनुरूप */
+    .v1{background:#F2E7FB;color:var(--cw1)}.v2{background:#E9E8FB;color:var(--cw2)}.v3{background:#E3F0FB;color:var(--cw3)}
+    .v4{background:#E6F3E7;color:var(--cw4)}.v5{background:#F8F0D8;color:#8a6508}.v6{background:#FBEADB;color:var(--cw6)}
+    .v7{background:#FBE3E3;color:var(--cw7)}.v8{background:#F2E7FB;color:var(--cw1)}.vk{background:#ECEFF1;color:#37474F}.avyaya{background:#F5F5F5;color:#424242}
+
+    /* ===== रंगीन पदच्छेद (Sanskrit syntax colour code) ===== */
+    .cs-word{cursor:pointer;text-underline-offset:.32em}
+    .cw1{color:var(--cw1)}.cw2{color:var(--cw2)}.cw3{color:var(--cw3)}.cw4{color:var(--cw4)}
+    .cw5{color:var(--cw5)}.cw6{color:var(--cw6)}.cw7{color:var(--cw7)}
+    .ul1,.ul2,.ul3,.ul4,.ul5,.ul6,.ul7{text-decoration-line:underline;text-decoration-thickness:3px;text-decoration-style:solid}
+    .ul1{text-decoration-color:var(--cw1)}.ul2{text-decoration-color:var(--cw2)}.ul3{text-decoration-color:var(--cw3)}
+    .ul4{text-decoration-color:var(--cw4)}.ul5{text-decoration-color:var(--cw5)}.ul6{text-decoration-color:var(--cw6)}
+    .ul7{text-decoration-color:var(--cw7)}
+    .u-atma{text-decoration-style:dashed}
+    .krid{text-decoration-line:underline;text-decoration-color:var(--cwK);text-decoration-thickness:1.5px}
+
+    .color-shloka-card{background:#fff;border:1px solid var(--border-light);border-radius:16px;overflow:hidden;box-shadow:0 4px 15px var(--shadow);margin-bottom:24px}
+    .cs-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:13px 22px;background:linear-gradient(135deg,#FFF3E0,#FFE8CC);border-bottom:1px solid var(--border-light)}
+    .cs-header h4{color:var(--dark-brown);font-size:.95rem;display:flex;align-items:center;gap:8px}
+    .cs-header .cs-sub{font-size:.7rem;color:var(--medium-brown);letter-spacing:.5px}
+    .cs-words{padding:26px 30px 22px;font-size:1.4rem;line-height:2.5;text-align:center;color:var(--text-dark)}
+    .cs-words .cs-word{display:inline-block;padding:0 5px;border-radius:8px;transition:background .2s,transform .2s}
+    .cs-words .cs-word:hover{background:var(--light-gold);transform:translateY(-2px)}
+    .cs-legend{border-top:1px dashed var(--border-light);background:#FFFDF8}
+    .cs-legend summary{cursor:pointer;padding:10px 22px;font-size:.8rem;color:var(--deep-saffron);font-weight:bold;list-style:none;user-select:none}
+    .cs-legend summary::-webkit-details-marker{display:none}
+    .cs-legend summary::before{content:'▸ ';transition:transform .2s}
+    .cs-legend[open] summary::before{content:'▾ '}
+    .cs-legend-body{padding:4px 22px 18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .leg-title{font-size:.72rem;font-weight:bold;color:var(--medium-brown);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
+    .leg-items{display:flex;flex-direction:column;gap:5px}
+    .leg-item{font-size:.85rem;display:flex;align-items:baseline;gap:8px}
+    .leg-item .leg-word{font-weight:bold;min-width:88px;text-underline-offset:.3em}
+    .leg-item .leg-desc{font-size:.75rem;color:#888}
+    .cs-legend-note{grid-column:1/-1;font-size:.78rem;color:#666;line-height:1.9;border-top:1px dashed var(--border-light);padding-top:10px}
 
     .meaning-card{background:#fff;border-radius:16px;padding:24px;margin-bottom:20px;border-left:5px solid var(--saffron);box-shadow:0 4px 15px var(--shadow)}
     .meaning-card.secondary{border-left-color:var(--green-accent)}
@@ -235,6 +270,8 @@
         .tabs{flex-direction:column}
         .home-hero{padding:24px}
         .logo-text h1{font-size:1.05rem}
+        .cs-words{padding:18px 14px 14px;font-size:1.15rem;line-height:2.4}
+        .cs-legend-body{grid-template-columns:1fr}
     }
 </style>
 </head>
@@ -260,6 +297,7 @@
         <div class="nav-item" data-nav="bhagavatam" onclick="openGrantha('bhagavatam')">🌸 श्रीमद्भागवत</div>
         <div class="nav-item" data-nav="chalisa" onclick="openGrantha('chalisa')">🚩 हनुमान चालीसा</div>
         <div class="nav-item" data-nav="manas" onclick="openGrantha('manas')">🏹 रामचरितमानस</div>
+        <div class="nav-item" data-nav="manas_arth" onclick="openGrantha('manas_arth')">📖 मानस अर्थ सहित</div>
         <div class="nav-item" data-nav="about" onclick="go('about')">ℹ️ परिचय</div>
     </nav>
 </header>
@@ -302,6 +340,11 @@
                 <div class="sidebar-item-icon" style="background:#fff8e1">🏹</div>
                 <div class="sidebar-item-text"><div class="title">रामचरितमानस</div><div class="subtitle">Ramcharitmanas · 7 काण्ड</div></div>
                 <span class="sidebar-badge">1k</span>
+            </div>
+            <div class="sidebar-item" data-grantha="manas_arth" onclick="openGrantha('manas_arth')">
+                <div class="sidebar-item-icon" style="background:#fce4ec">📖</div>
+                <div class="sidebar-item-text"><div class="title">मानस अर्थ सहित</div><div class="subtitle">गीता प्रेस · 7 काण्ड · हिन्दी अर्थ</div></div>
+                <span class="sidebar-badge">7k</span>
             </div>
         </div>
         <div class="sidebar-section">
@@ -359,6 +402,12 @@
                     <p>गोस्वामी तुलसीदास कृत ७ काण्ड — बालकाण्ड से उत्तरकाण्ड तक १०७३ दोहे एवं चौपाइयाँ।</p>
                     <div class="tc-count">मूल पाठ उपलब्ध ✓</div>
                 </div>
+                <div class="tree-card animate-in" onclick="openGrantha('manas_arth')">
+                    <div class="tc-num">📖 MANAS ARTH SAHIT</div>
+                    <h3>रामचरितमानस (अर्थ सहित)</h3>
+                    <p>गीता प्रेस, गोरखपुर — ७ काण्ड · ६,९५७ प्रविष्टियाँ · प्रत्येक दोहा-चौपाई के साथ हिन्दी भावार्थ।</p>
+                    <div class="tc-count">अर्थ सहित उपलब्ध ✓</div>
+                </div>
             </div>
             <div class="section-title">🔖 प्रमुख श्लोक</div>
             <div class="cards-grid" id="featured-cards"></div>
@@ -388,15 +437,16 @@
                 <div class="about-section">
                     <h3>📘 विभक्ति एवं कारक</h3>
                     <ul class="feature-list">
-                        <li><strong>प्रथमा</strong> — कर्ता (Nominative)</li>
-                        <li><strong>द्वितीया</strong> — कर्म (Accusative)</li>
-                        <li><strong>तृतीया</strong> — करण (Instrumental)</li>
-                        <li><strong>चतुर्थी</strong> — सम्प्रदान (Dative)</li>
-                        <li><strong>पञ्चमी</strong> — अपादान (Ablative)</li>
-                        <li><strong>षष्ठी</strong> — सम्बन्ध (Genitive)</li>
-                        <li><strong>सप्तमी</strong> — अधिकरण (Locative)</li>
-                        <li><strong>सम्बोधन</strong> — Vocative · <strong>अव्यय</strong> — Indeclinable</li>
+                        <li><strong class="cw1">प्रथमा</strong> — कर्ता (Nominative)</li>
+                        <li><strong class="cw2">द्वितीया</strong> — कर्म (Accusative)</li>
+                        <li><strong class="cw3">तृतीया</strong> — करण (Instrumental)</li>
+                        <li><strong class="cw4">चतुर्थी</strong> — सम्प्रदान (Dative)</li>
+                        <li><strong class="cw5">पञ्चमी</strong> — अपादान (Ablative)</li>
+                        <li><strong class="cw6">षष्ठी</strong> — सम्बन्ध (Genitive)</li>
+                        <li><strong class="cw7">सप्तमी</strong> — अधिकरण (Locative)</li>
+                        <li><strong class="cw1">सम्बोधन</strong> — Vocative · <strong>अव्यय</strong> — Indeclinable</li>
                     </ul>
+                    <p style="font-size:.82rem;color:#888">श्लोक-विश्लेषण में यही रंग-योजना "रंगीन पदच्छेद" में प्रयुक्त होती है — संज्ञा-पद का अक्षर-रंग विभक्ति दर्शाता है तथा क्रिया-पद की रेखा का रंग लकार।</p>
                 </div>
                 <div class="about-section">
                     <h3>💾 डेटा प्रबन्धन</h3>
@@ -441,7 +491,10 @@ const SOURCES = {
                   cdn:'./data/chalisa.json' },
     manas:      { title:'श्री रामचरितमानस', icon:'🏹',
                   local:'./data/manas.json',
-                  cdn:'./data/manas.json' }
+                  cdn:'./data/manas.json' },
+    manas_arth: { title:'रामचरितमानस (अर्थ सहित)', icon:'📖',
+                  local:'./data/manas_arth_sahit.json',
+                  cdn:'./data/manas_arth_sahit.json' }
 };
 
 /* ---- grammar code decoders ---- */
@@ -482,6 +535,84 @@ function normUser(r){
     return { pad:r.pad||'', mool:r.mool||'', deriv:'', upasarga:r.upasarga||'', pratyaya:r.pratyaya||'',
              gram:[r.vibhakti,r.vachan].filter(Boolean).join(' · ')||'—', karaka:r.karaka||'', linga:r.linga||'',
              cls:VIB2CLASS[r.vibhakti]||'avyaya', arth:r.arth||'', parts:null, auto:false };
+}
+
+/* ---- रंगीन पदच्छेद: colour-code maps ----
+   संज्ञा-पद → अक्षर-रंग (विभक्ति के अनुसार, सम्बोधन = प्रथमा)
+   क्रिया-पद → रेखा-रंग (लकार-समूह के अनुसार), ठोस = परस्मैपद, डैश = आत्मनेपद
+   कृदन्त    → विभक्ति-रंग + पतली लाल रेखा; अव्यय → सादा                    */
+const CW_TEXT = ['','cw1','cw2','cw3','cw4','cw5','cw6','cw7','cw1'];
+const LAK_UL = {'लट्':'ul1','लङ्':'ul2','लुङ्':'ul2','लिट्':'ul2','लृट्':'ul3','लुट्':'ul3',
+                'लोट्':'ul4','विधिलिङ्':'ul5','आशीर्लिङ्':'ul6','लृङ्':'ul7','लेट्':'ul7'};
+const VIB2CW = {'प्रथमा':'cw1','द्वितीया':'cw2','तृतीया':'cw3','चतुर्थी':'cw4','पञ्चमी':'cw5','षष्ठी':'cw6','सप्तमी':'cw7','सम्बोधन':'cw1'};
+function wordColorCls(r){
+    const cls=[];
+    if(r.parts){                                   // structured (gita pc) data
+        let noun=null, verb=null;
+        for(const p of r.parts){ if(p.cn) noun=p; if(p.pn!=null) verb=p; }
+        if(verb){
+            cls.push(LAK_UL[verb.t]||'ul7');
+            if((verb.pp||'')[0]==='A') cls.push('u-atma');
+        } else if(noun){
+            const a=Number(String(noun.cn).split('.')[0]);
+            if(CW_TEXT[a]) cls.push(CW_TEXT[a]);
+            if(noun.inf || (noun.s&&noun.s.length) || (noun.vp&&noun.vp.length)) cls.push('krid');   // कृदन्त
+        }
+    } else {                                       // flat rows (user override / auto)
+        const first=(r.gram||'').split(' · ')[0];
+        if(LAK_UL[first]){ cls.push(LAK_UL[first]); if((r.gram||'').includes('आत्मनेपद')) cls.push('u-atma'); }
+        else if(VIB2CW[first]) cls.push(VIB2CW[first]);
+    }
+    return cls.join(' ');
+}
+
+function renderColorShloka(id, rows){
+    const words = rows.map((r,i)=>
+        `<span class="cs-word ${wordColorCls(r)}" onclick="showWord('${id}',${i})" title="विवरण देखें">${r.pad}</span>`
+    ).join(' ');
+    const li=(word,cls,label,desc)=>`<div class="leg-item"><span class="leg-word ${cls}">${word}</span><span>${label}</span>${desc?`<span class="leg-desc">${desc}</span>`:''}</div>`;
+    return `
+    <div class="color-shloka-card animate-in">
+        <div class="cs-header">
+            <h4>🎨 रंगीन पदच्छेद</h4>
+            <span class="cs-sub">अक्षर-रंग = विभक्ति &nbsp;·&nbsp; रेखा-रंग = लकार &nbsp;·&nbsp; पद पर क्लिक करें</span>
+        </div>
+        <div class="cs-words">${words}</div>
+        <details class="cs-legend">
+            <summary>रंग-संकेत (Legend)</summary>
+            <div class="cs-legend-body">
+                <div>
+                    <div class="leg-title">संज्ञा-पद — अक्षर का रंग (विभक्ति)</div>
+                    <div class="leg-items">
+                        ${li('रामः','cw1','प्रथमा / सम्बोधन','कर्ता')}
+                        ${li('ग्रामम्','cw2','द्वितीया','कर्म')}
+                        ${li('रामेण','cw3','तृतीया','करण')}
+                        ${li('रामाय','cw4','चतुर्थी','सम्प्रदान')}
+                        ${li('रामात्','cw5','पञ्चमी','अपादान')}
+                        ${li('रामस्य','cw6','षष्ठी','सम्बन्ध')}
+                        ${li('रामे','cw7','सप्तमी','अधिकरण')}
+                        ${li('च · एव','','अव्यय','सादा — बिना रंग')}
+                    </div>
+                </div>
+                <div>
+                    <div class="leg-title">क्रिया-पद — रेखा का रंग (लकार)</div>
+                    <div class="leg-items">
+                        ${li('गच्छति','ul1','लट्','वर्तमान')}
+                        ${li('अगच्छत्','ul2','लङ् · लुङ् · लिट्','भूत')}
+                        ${li('गमिष्यति','ul3','लृट् · लुट्','भविष्य')}
+                        ${li('गच्छतु','ul4','लोट्','आज्ञा')}
+                        ${li('गच्छेत्','ul5','विधिलिङ्','विधि / सम्भावना')}
+                        ${li('गम्यात्','ul6','आशीर्लिङ्','आशीर्वाद')}
+                        ${li('अगमिष्यत्','ul7','लृङ्','संकेत / हेतुहेतुमद्')}
+                    </div>
+                </div>
+                <div class="cs-legend-note">
+                    <span class="ul1">ठोस रेखा</span> = परस्मैपद &nbsp;·&nbsp; <span class="ul1 u-atma">डैश रेखा</span> = आत्मनेपद &nbsp;·&nbsp;
+                    <span class="cw1 krid">रंगीन पद + पतली लाल रेखा</span> = कृदन्त (क्त · शतृ · सन् आदि — विभक्ति का रंग, क्रिया की रेखा)
+                </div>
+            </div>
+        </details>
+    </div>`;
 }
 
 /* ---- auto (machine-generated Bhagavatam) analysis ---- */
@@ -844,7 +975,7 @@ function renderAnalysis(g, v){
             <tbody>
             ${rows.map((r,i)=>`
                 <tr>
-                    <td class="pad-cell" onclick="showWord('${id}',${i})">${r.pad}</td>
+                    <td class="pad-cell" onclick="showWord('${id}',${i})"><span class="cs-word ${wordColorCls(r)}">${r.pad}</span></td>
                     <td>${r.mool||'—'}${r.deriv?`<span class="deriv">→ ${r.deriv}</span>`:''}</td>
                     <td>${r.upasarga||'—'}</td>
                     <td>${r.pratyaya||'—'}</td>
@@ -864,6 +995,8 @@ function renderAnalysis(g, v){
     const qa    = v.qa || [];
     const sb    = v.sb || '';
 
+    const colorShloka = rows.length ? renderColorShloka(id, rows) : '';
+
     const html = `
         <div class="shlok-header-card animate-in">
             <span class="shlok-source-badge">${SOURCES[g.key].icon} ${g.title} · ${meta.ref}</span>
@@ -873,6 +1006,8 @@ function renderAnalysis(g, v){
                 ${v.v.split(/[।॥]\s*/).filter(Boolean).map((l,i,a)=>`<p>${l}${i<a.length-1?' ।':' ॥'}</p>`).join('')}
             </div>
         </div>
+
+        ${colorShloka}
 
         <div class="meaning-card secondary animate-in">
             <h4>💡 ${g.custom && g.custom.hs ? g.custom.hs.name : 'हिन्दी अर्थ'} ${ov.hindi?'<span style="font-size:.7rem;color:var(--green-accent)">(आपके द्वारा)</span>':''}</h4>
