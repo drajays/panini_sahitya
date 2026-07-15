@@ -519,16 +519,22 @@ function decodePada(pp){ return pp ? (PADA[pp[0]]||pp) : ''; }
 /* normalise one padccheda item (repo shape) into a display row */
 function normPc(item){
     const parts = item.p || [];
-    const mool  = parts.map(p=>p.l).filter(Boolean).join(' + ');
+    const mool  = item.m || parts.map(p=>p.l).filter(Boolean).join(' + ');
     const deriv = parts.map(p=>p.inf||p.fin).filter(Boolean).join(' ');
-    const upa   = [...new Set(parts.flatMap(p=>p.vp||[]))].join(' + ');
-    const pra   = [...new Set(parts.flatMap(p=>p.s||[]))].join(' + ');
-    let gram='—', karaka='', cls='avyaya';
+    const upa   = item.u || [...new Set(parts.flatMap(p=>p.vp||[]))].join(' + ');
+    const pra   = item.s ? (Array.isArray(item.s)?item.s.join(' + '):item.s) : [...new Set(parts.flatMap(p=>p.s||[]))].join(' + ');
+    let gram='—', karaka=item.k||'', cls=item.cls||'avyaya';
     for(const p of parts){
-        if(p.cn){ const d=decodeCn(p.cn); gram=d.vibhakti+' · '+d.vachan; karaka=d.karaka; cls=d.cls; }
-        else if(p.pn!=null){ const d=decodePn(p.pn); gram=[p.t,d.purusha,d.vachan,decodePada(p.pp)].filter(Boolean).join(' · '); cls='vk'; }
+        if(p.cn){ const d=decodeCn(p.cn); gram=item.g||(d.vibhakti+' · '+d.vachan); karaka=item.k||d.karaka; cls=item.cls||d.cls; }
+        else if(p.pn!=null){ const d=decodePn(p.pn); gram=item.g||([p.t,d.purusha,d.vachan,decodePada(p.pp)].filter(Boolean).join(' · ')); cls=item.cls||'vk'; }
     }
-    return { pad:item.w, mool, deriv, upasarga:upa, pratyaya:pra, gram, karaka, linga:'', cls, arth:item.e||'', parts, auto:true };
+    if(item.g) gram = item.g;
+    if(gram && !item.cls && cls==='avyaya' && gram !== '—' && gram !== 'अव्यय'){
+        const vibName = gram.split(' · ')[0];
+        if(VIB2CLASS[vibName]) cls = VIB2CLASS[vibName];
+        else if(gram.includes('लट्')||gram.includes('लिट्')||gram.includes('लङ्')||gram.includes('विधिलिङ्')||gram.includes('लोट्')) cls = 'vk';
+    }
+    return { pad:item.w, mool, deriv, upasarga:upa, pratyaya:pra, gram, karaka, linga:item.l||'', cls, arth:item.e||'', parts, auto:true };
 }
 /* normalise a user-entered override row (flat strings) */
 function normUser(r){
@@ -637,8 +643,8 @@ function autoRowsFor(grantha, v){
 function hasAutoGrammar(rows){ return rows && rows.some(r=>r.g); }
 function normAuto(r){
     const vibName = (r.g||'').split(' · ')[0];
-    return { pad:r.w, mool:r.m||'', deriv:'', upasarga:r.u||'', pratyaya:'',
-             gram:r.g||'—', karaka:r.k||'', linga:r.l||'', cls:VIB2CLASS[vibName]||'avyaya', arth:'', parts:null, auto:true };
+    return { pad:r.w, mool:r.m||'', deriv:'', upasarga:r.u||'', pratyaya:r.s||'',
+             gram:r.g||'—', karaka:r.k||'', linga:r.l||'', cls:VIB2CLASS[vibName]||'avyaya', arth:r.e||'', parts:null, auto:true };
 }
 
 /* ---- state ---- */
@@ -851,7 +857,15 @@ function renderVerses(g, chNum){
             ${badge}
         </div>`;
     }).join('');
-    document.getElementById('browse-body').innerHTML = `<div class="verse-list">${rows}</div>`;
+    let essayHtml = '';
+    if(ch && ch.essay){
+        let cleanEssay = ch.essay.replace(/href="#v(\d+)"/g, `href="javascript:void(0)" onclick="openVerse('${g.key}|${chNum}.$1')"`);
+        essayHtml = `
+        <div class="chapter-essay-card animate-in" style="background:var(--cream);border-radius:12px;padding:22px;margin-bottom:24px;border:1px solid var(--border);box-shadow:0 5px 16px rgba(0,0,0,.12);overflow-x:auto">
+            ${cleanEssay}
+        </div>`;
+    }
+    document.getElementById('browse-body').innerHTML = `${essayHtml}<div class="verse-list">${rows}</div>`;
 }
 
 /* ---- verse analysis ---- */
